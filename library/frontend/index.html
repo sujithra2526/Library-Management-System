@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bookwise Library Catalogue</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=Newsreader:opsz,wght@6..72,500;6..72,600&display=swap">
+<style>
+:root{--bg:#f3f4f7;--surface:#fff;--ink:#18212f;--muted:#617083;--line:#dce0e7;--accent:#1d4e89;--accent-soft:#e6eef8;--ok:#2d7a55;--bad:#b0412e;--bar:#14233b}
+[data-theme=dark]{--bg:#0f1622;--surface:#172131;--ink:#e8edf5;--muted:#9aa8bb;--line:#2a374b;--accent:#6aa3e8;--accent-soft:#1f2f47;--ok:#58b98a;--bad:#e07a67;--bar:#0b111b}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "IBM Plex Sans",system-ui,sans-serif}
+h1,h2,h3,.serif{font-family:Newsreader,Georgia,serif;font-weight:600}
+button,input,select{font:inherit;color:inherit}
+button{cursor:pointer}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+header{background:var(--bar);color:#fff}
+.hd{max-width:1180px;margin:auto;padding:18px 20px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.brand{margin-right:auto}
+.brand h1{margin:0;font-size:1.6rem;letter-spacing:.2px}
+.brand span{color:#a9b8cf;font-size:.88rem}
+.search{flex:1 1 380px;max-width:560px}
+.search input{width:100%;padding:11px 16px;border-radius:6px;border:1px solid #3a4c68;background:#1c2f4d;color:#fff;font-size:1rem}
+.search input::placeholder{color:#93a5c0}
+.link{background:none;border:1px solid #3a4c68;color:#dbe4f2;border-radius:6px;padding:8px 14px}
+
+.wrap{max-width:1180px;margin:auto;padding:20px}
+.stats{display:flex;background:var(--surface);border:1px solid var(--line);border-radius:8px;margin-bottom:20px;flex-wrap:wrap}
+.stat{flex:1 1 120px;padding:14px 20px;border-right:1px solid var(--line)}
+.stat:last-child{border-right:none}
+.stat b{display:block;font:600 1.7rem Newsreader,serif}
+.stat span{color:var(--muted);font-size:.88rem}
+
+.layout{display:grid;grid-template-columns:230px 1fr;gap:20px;align-items:start}
+@media(max-width:800px){.layout{grid-template-columns:1fr}}
+aside{background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 14px 14px}
+aside h2{font-size:1.05rem;margin:14px 0 6px}
+.opt{display:flex;justify-content:space-between;width:100%;text-align:left;background:none;border:none;border-left:3px solid transparent;padding:6px 8px;border-radius:0 4px 4px 0;color:var(--ink)}
+.opt:hover{background:var(--accent-soft)}
+.opt.on{background:var(--accent-soft);border-left-color:var(--accent);font-weight:600;color:var(--accent)}
+.opt small{color:var(--muted)}
+.az{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.az button{padding:4px 0;border:1px solid var(--line);background:none;border-radius:4px;font-size:.8rem}
+.az button.on{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+.bar{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.bar .count{margin-right:auto;color:var(--muted)}
+select{padding:7px 10px;border:1px solid var(--line);border-radius:6px;background:var(--surface)}
+.seg button{border:1px solid var(--line);background:var(--surface);padding:7px 13px}
+.seg button:first-child{border-radius:6px 0 0 6px}.seg button:last-child{border-radius:0 6px 6px 0;border-left:none}
+.seg button.on{background:var(--accent);border-color:var(--accent);color:#fff}
+
+#res{background:var(--surface);border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.ltr{background:var(--bg);padding:4px 16px;font:600 1.1rem Newsreader,serif;color:var(--accent);border-bottom:1px solid var(--line)}
+.row{display:grid;grid-template-columns:44px 1fr 120px 150px 110px;gap:14px;align-items:center;padding:10px 16px;border-bottom:1px solid var(--line);cursor:pointer}
+.row:hover{background:var(--accent-soft)}
+.cv{height:56px;border-radius:3px;display:grid;place-items:center;color:#fff;font:600 1.4rem Newsreader,serif;background:var(--c)}
+.t{font-weight:600}.m{color:var(--muted);font-size:.88rem}
+.st{display:inline-flex;align-items:center;gap:6px;font-size:.88rem}
+.st i{width:8px;height:8px;border-radius:50%;background:var(--ok)}
+.st.out i{background:var(--bad)}
+.rate{color:#b7791f;letter-spacing:1px}
+.sv{background:none;border:none;color:var(--muted);padding:0;font-size:.85rem;text-decoration:underline}
+.sv.on{color:var(--accent);font-weight:600}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:16px;padding:16px}
+.grid .ltr{grid-column:1/-1;border:none;padding:0;background:none}
+.grid .row{display:block;border:1px solid var(--line);border-radius:8px;padding:0;overflow:hidden}
+.grid .cv{height:110px;border-radius:0;font-size:2.6rem}
+.grid .cell{padding:4px 12px}
+.grid .row .c3,.grid .row .c4,.grid .row .c5{padding:2px 12px 8px;display:block}
+@media(max-width:700px){.row{grid-template-columns:44px 1fr}.row .c3,.row .c4,.row .c5{display:none}}
+.empty{padding:40px;text-align:center;color:var(--muted)}
+
+dialog{border:none;border-radius:10px;padding:0;width:92%;max-width:520px;background:var(--surface);color:var(--ink);box-shadow:0 24px 60px rgba(0,0,0,.35)}
+dialog::backdrop{background:rgba(10,18,32,.6)}
+.dh{padding:20px 24px;background:var(--bar);color:#fff}
+.dh h2{margin:0;font-size:1.5rem}.dh div{color:#b8c6dc}
+.db{padding:20px 24px}
+.kv{display:grid;grid-template-columns:110px 1fr;gap:6px 10px;margin:0 0 14px}
+.kv dt{color:var(--muted)}.kv dd{margin:0}
+.rt button{background:none;border:none;font-size:1.4rem;color:#b7791f;padding:0 2px}
+.btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.btn{border:1px solid var(--accent);background:var(--surface);color:var(--accent);padding:9px 16px;border-radius:6px;font-weight:500;text-decoration:none;display:inline-block}
+.btn.pri{background:var(--accent);color:#fff}
+.btn.del{border-color:var(--bad);color:var(--bad)}
+details{margin-top:20px;background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:12px 16px}
+summary{cursor:pointer;font:600 1.05rem Newsreader,serif}
+form{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px;margin-top:12px}
+form input{padding:9px 12px;border:1px solid var(--line);border-radius:6px;background:var(--bg)}
+[hidden]{display:none!important}
+#login{min-height:100vh;display:grid;grid-template-columns:1fr 1fr}
+.lp-brand{background:var(--bar);color:#fff;padding:60px 48px;display:flex;flex-direction:column;justify-content:center}
+.lp-brand h1{font-size:2.6rem;margin:0 0 12px}
+.lp-brand p{color:#b8c6dc;max-width:380px;font-size:1.05rem;margin:0}
+.lp-form{display:grid;place-items:center;padding:24px}
+#lf{width:100%;max-width:360px;display:grid;gap:14px;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:28px}
+#lf h2{margin:0;font-size:1.6rem}
+#lf label{display:grid;gap:4px;font-weight:500}
+#lf input{padding:10px 12px;border:1px solid var(--line);border-radius:6px;background:var(--bg)}
+.err{color:var(--bad);min-height:1.2em;font-size:.9rem}
+.hint{margin:0;color:var(--muted);font-size:.82rem}
+@media(max-width:760px){#login{grid-template-columns:1fr}.lp-brand{padding:32px 24px}}
+</style>
+</head>
+<body>
+<main id="login">
+  <div class="lp-brand"><h1>Bookwise Library</h1><p>Sign in to search the catalogue, borrow titles and read e-books online.</p></div>
+  <div class="lp-form">
+    <form id="lf">
+      <h2>Sign in</h2>
+      <label>Username<input name="u" autocomplete="username" required autofocus></label>
+      <label>Password<input name="p" type="password" autocomplete="current-password" required></label>
+      <div id="err" class="err" role="alert"></div>
+      <button class="btn pri" type="submit">Sign in</button>
+      <p class="hint">Demo accounts: admin / admin123 (librarian), member / member123 (member)</p>
+    </form>
+  </div>
+</main>
+
+<div id="app" hidden>
+<header>
+  <div class="hd">
+    <div class="brand"><h1>Bookwise Library</h1><span>Catalogue and e-book access</span></div>
+    <div class="search"><input id="q" type="search" placeholder="Search by title, author or genre" aria-label="Search the catalogue"></div>
+    <span id="who" style="color:#b8c6dc;font-size:.9rem"></span>
+    <button class="link" id="theme" type="button">Dark mode</button>
+    <button class="link" id="out" type="button">Sign out</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="stats" id="stats"></div>
+  <div class="layout">
+    <aside aria-label="Filters">
+      <h2>Show</h2><div id="quick"></div>
+      <h2>Genre</h2><div id="genres"></div>
+      <h2>Title starts with</h2><div class="az" id="az"></div>
+    </aside>
+    <section>
+      <div class="bar">
+        <span class="count" id="count" aria-live="polite"></span>
+        <select id="sort" aria-label="Sort order"><option value="az">Title A to Z</option><option value="za">Title Z to A</option><option value="rate">Highest rated</option></select>
+        <div class="seg"><button type="button" data-view="list" class="on">List</button><button type="button" data-view="grid">Grid</button></div>
+      </div>
+      <div id="res"></div>
+      <details id="add-box">
+        <summary>Add a book to the catalogue</summary>
+        <form id="add">
+          <input name="title" placeholder="Title" required>
+          <input name="author" placeholder="Author" required>
+          <input name="genre" placeholder="Genre">
+          <input name="url" type="url" placeholder="E-book link (optional)">
+          <button class="btn pri" type="submit">Add book</button>
+        </form>
+      </details>
+    </section>
+  </div>
+</div>
+</div>
+<dialog id="dlg"></dialog>
+
+<script>
+const DEFAULTS=[
+  {id:1,title:"The Alchemist",author:"Paulo Coelho",genre:"Fiction",rating:5,url:"auto"},
+  {id:2,title:"Wings of Fire",author:"A. P. J. Abdul Kalam",genre:"Autobiography",rating:5,url:"auto"},
+  {id:3,title:"Pride and Prejudice",author:"Jane Austen",genre:"Classic",rating:5,url:"https://www.gutenberg.org/ebooks/1342",due:"2026-10-12"},
+  {id:4,title:"Clean Code",author:"Robert C. Martin",genre:"Technology",rating:4,url:"auto"},
+  {id:5,title:"Godan",author:"Munshi Premchand",genre:"Classic",rating:4,url:""},
+  {id:6,title:"A Brief History of Time",author:"Stephen Hawking",genre:"Science",rating:5,url:"auto"},
+  {id:7,title:"Ponniyin Selvan",author:"Kalki Krishnamurthy",genre:"Historical",rating:5,url:"auto",due:"2026-10-15"},
+  {id:8,title:"Introduction to Algorithms",author:"Cormen et al.",genre:"Technology",rating:4,url:""},
+  {id:9,title:"Sherlock Holmes",author:"Arthur Conan Doyle",genre:"Fiction",rating:4,url:"https://www.gutenberg.org/ebooks/1661"}
+];
+let books=DEFAULTS;
+try{const s=localStorage.getItem("bw-pro");if(s)books=JSON.parse(s);}catch(e){}
+const save=()=>{try{localStorage.setItem("bw-pro",JSON.stringify(books));}catch(e){}};
+const S={q:"",sort:"az",view:"list",genre:"All",letter:"All",quick:"all",open:null};
+const $=id=>document.getElementById(id);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const key=t=>t.replace(/^(the|a|an)\s+/i,"").toLowerCase();
+const L=b=>key(b.title).charAt(0).toUpperCase();
+const col=b=>`hsl(${[...b.title].reduce((h,c)=>(h*31+c.charCodeAt(0))%360,7)},32%,36%)`;
+const stars=n=>"★".repeat(n||0)+"☆".repeat(5-(n||0));
+const link=b=>b.url==="auto"?"https://openlibrary.org/search?q="+encodeURIComponent(b.title+" "+b.author):b.url;
+const quickDefs=[["all","All books",()=>true],["avail","Available",b=>!b.due],["out","Borrowed",b=>!!b.due],["ebook","With e-book",b=>!!b.url],["saved","Saved for later",b=>b.fav]];
+
+function list(ignoreGenre){
+  const q=S.q.toLowerCase(),qd=quickDefs.find(x=>x[0]===S.quick)[2];
+  const r=books.filter(b=>(ignoreGenre||S.genre==="All"||b.genre===S.genre)&&(S.letter==="All"||L(b)===S.letter)&&qd(b)&&(b.title+" "+b.author+" "+b.genre).toLowerCase().includes(q));
+  const c=(a,b)=>key(a.title).localeCompare(key(b.title));
+  return r.sort(S.sort==="za"?(a,b)=>c(b,a):S.sort==="rate"?(a,b)=>(b.rating||0)-(a.rating||0)||c(a,b):c);
+}
+
+function chrome(){
+  const n=books.length,out=books.filter(b=>b.due).length;
+  $("stats").innerHTML=[["Titles",n],["Available",n-out],["Borrowed",out],["E-books",books.filter(b=>b.url).length],["Saved",books.filter(b=>b.fav).length]].map(([l,v])=>`<div class="stat"><b>${v}</b><span>${l}</span></div>`).join("");
+  $("quick").innerHTML=quickDefs.map(([k,l,f])=>`<button class="opt ${S.quick===k?"on":""}" data-quick="${k}"><span>${l}</span><small>${books.filter(f).length}</small></button>`).join("");
+  const gs=[...new Set(books.map(b=>b.genre).filter(Boolean))].sort();
+  $("genres").innerHTML=[["All",n],...gs.map(g=>[g,books.filter(b=>b.genre===g).length])].map(([g,c])=>`<button class="opt ${S.genre===g?"on":""}" data-genre="${esc(g)}"><span>${esc(g)}</span><small>${c}</small></button>`).join("");
+  $("az").innerHTML=["All",..."ABCDEFGHIJKLMNOPQRSTUVWXYZ"].map(l=>`<button class="${S.letter===l?"on":""}" data-l="${l}">${l}</button>`).join("");
+}
+
+function results(){
+  const r=list();
+  $("count").textContent=`${r.length} ${r.length===1?"title":"titles"}`;
+  if(!r.length){$("res").className="";$("res").innerHTML=`<div class="empty">No titles match. Clear the search or change a filter.</div>`;return;}
+  $("res").className=S.view==="grid"?"grid":"";
+  let h="",cur="";
+  r.forEach(b=>{
+    if(S.sort!=="rate"&&L(b)!==cur){cur=L(b);h+=`<div class="ltr">${cur}</div>`;}
+    h+=`<div class="row" tabindex="0" data-id="${b.id}">
+      <div class="cv" style="--c:${col(b)}">${L(b)}</div>
+      <div class="cell"><div class="t">${esc(b.title)}</div><div class="m">${esc(b.author)}${b.url?" · E-book available":""}</div></div>
+      <div class="c3 m">${esc(b.genre||"General")}</div>
+      <div class="c4"><span class="st ${b.due?"out":""}"><i></i>${b.due?"Due "+b.due:"Available"}</span><div class="rate">${stars(b.rating)}</div></div>
+      <div class="c5"><button class="sv ${b.fav?"on":""}" data-fav="${b.id}">${b.fav?"Saved":"Save for later"}</button></div></div>`;
+  });
+  $("res").innerHTML=h;
+}
+
+function dialog(){
+  const b=books.find(x=>x.id===S.open);if(!b)return;
+  $("dlg").innerHTML=`<div class="dh"><h2>${esc(b.title)}</h2><div>${esc(b.author)}</div></div>
+  <div class="db"><dl class="kv"><dt>Genre</dt><dd>${esc(b.genre||"General")}</dd>
+    <dt>Print copy</dt><dd>${b.due?"Borrowed, due "+b.due:"Available on the shelf"}</dd>
+    <dt>E-book</dt><dd>${b.url?"Available online":"Not available"}</dd>
+    <dt>Rating</dt><dd class="rt">${[1,2,3,4,5].map(i=>`<button data-rate="${i}" aria-label="Rate ${i} out of 5">${i<=(b.rating||0)?"★":"☆"}</button>`).join("")}</dd></dl>
+    <div class="btns">
+      ${b.url?`<a class="btn pri" href="${esc(link(b))}" target="_blank" rel="noopener">Read e-book</a>`:""}
+      ${b.due?`<button class="btn" data-return="1">Return book</button>`:`<button class="btn" data-borrow="1">Borrow for 14 days</button>`}
+      <button class="btn" data-favd="1">${b.fav?"Remove from saved":"Save for later"}</button>
+      ${user&&user.role==="Librarian"?`<button class="btn del" data-remove="1">Delete</button>`:""}
+      <button class="btn" data-close="1">Close</button></div></div>`;
+}
+const refresh=()=>{chrome();results();if($("dlg").open)dialog();};
+
+$("q").addEventListener("input",e=>{S.q=e.target.value;results();});
+$("sort").addEventListener("change",e=>{S.sort=e.target.value;results();});
+document.addEventListener("click",e=>{
+  const t=e.target,d=t.dataset;
+  if(d.view){S.view=d.view;document.querySelectorAll("[data-view]").forEach(x=>x.classList.toggle("on",x===t));results();}
+  else if(t.closest("[data-quick]")){S.quick=t.closest("[data-quick]").dataset.quick;refresh();}
+  else if(t.closest("[data-genre]")){S.genre=t.closest("[data-genre]").dataset.genre;refresh();}
+  else if(d.l){S.letter=d.l;refresh();}
+  else if(d.fav){const b=books.find(x=>x.id==d.fav);b.fav=!b.fav;save();refresh();}
+  else if(t.closest(".row")){S.open=Number(t.closest(".row").dataset.id);dialog();$("dlg").showModal();}
+  else if(t.closest("#dlg")){
+    const b=books.find(x=>x.id===S.open);
+    if(d.rate)b.rating=Number(d.rate);
+    else if(d.borrow){const x=new Date();x.setDate(x.getDate()+14);b.due=x.toISOString().slice(0,10);}
+    else if(d.return)delete b.due;
+    else if(d.favd)b.fav=!b.fav;
+    else if(d.remove){if(confirm(`Delete "${b.title}" from the catalogue?`)){books=books.filter(x=>x.id!==b.id);$("dlg").close();}}
+    else if(d.close){$("dlg").close();return;}
+    else return;
+    save();refresh();
+  }else if(t===$("dlg"))$("dlg").close();
+});
+document.addEventListener("keydown",e=>{if((e.key==="Enter"||e.key===" ")&&e.target.classList.contains("row")){e.preventDefault();e.target.click();}});
+$("theme").addEventListener("click",()=>{
+  const dark=document.documentElement.dataset.theme==="dark";
+  document.documentElement.dataset.theme=dark?"":"dark";
+  $("theme").textContent=dark?"Dark mode":"Light mode";
+});
+$("add").addEventListener("submit",e=>{
+  e.preventDefault();const f=new FormData(e.target);
+  books.push({id:books.reduce((m,b)=>Math.max(m,b.id),0)+1,title:f.get("title").trim(),author:f.get("author").trim(),genre:f.get("genre").trim()||"General",rating:0,url:f.get("url").trim()});
+  save();e.target.reset();S.genre=S.letter="All";S.quick="all";refresh();
+});
+// ---- Login (demo only: replace USERS with a real API call to your backend) ----
+const USERS={admin:{pw:"admin123",role:"Librarian",name:"Admin"},member:{pw:"member123",role:"Member",name:"Member"}};
+let user=null;
+try{user=JSON.parse(sessionStorage.getItem("bw-user"));}catch(e){}
+function showApp(){
+  $("login").hidden=!!user;$("app").hidden=!user;
+  if(user){$("who").textContent=user.name+" ("+user.role+")";$("add-box").hidden=user.role!=="Librarian";refresh();}
+}
+$("lf").addEventListener("submit",e=>{
+  e.preventDefault();const f=new FormData(e.target);
+  const u=USERS[f.get("u").trim().toLowerCase()];
+  if(u&&u.pw===f.get("p")){user=u;try{sessionStorage.setItem("bw-user",JSON.stringify(u));}catch(x){}$("err").textContent="";e.target.reset();showApp();}
+  else $("err").textContent="Incorrect username or password.";
+});
+$("out").addEventListener("click",()=>{user=null;try{sessionStorage.removeItem("bw-user");}catch(e){}if($("dlg").open)$("dlg").close();showApp();});
+showApp();
+</script>
+</body>
+</html>
